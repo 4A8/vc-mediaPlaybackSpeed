@@ -33,12 +33,6 @@ const settings = definePluginSettings({
             </Heading>;
         }
     },
-    defaultVoiceMessageSpeed: {
-        type: OptionType.SLIDER,
-        default: 1,
-        description: "Voice messages",
-        markers: speeds,
-    },
     defaultVideoSpeed: {
         type: OptionType.SLIDER,
         default: 1,
@@ -74,8 +68,6 @@ export default definePlugin({
             if (!mediaRef?.current) return;
             const media = mediaRef.current;
             if (media.tagName === "AUDIO") {
-                const isVoiceMessage = media.className.includes("audioElement_");
-                changeSpeed(isVoiceMessage ? settings.store.defaultVoiceMessageSpeed : settings.store.defaultAudioSpeed);
             } else if (media.tagName === "VIDEO") {
                 changeSpeed(settings.store.defaultVideoSpeed);
             }
@@ -123,14 +115,6 @@ export default definePlugin({
     },
 
     patches: [
-        // voice message embeds
-        {
-            find: "\"--:--\"",
-            replacement: {
-                match: /onVolumeShow:\i,onVolumeHide:\i\}\)(?<=useCallback\(\(\)=>\{let \i=(\i).current;.+?)/,
-                replace: "$&,$self.renderComponent($1)"
-            }
-        },
         // audio & video embeds
         {
             // need to pass media ref via props to make it easily accessible from inside controls
